@@ -1,11 +1,13 @@
 #!/bin/bash
 
+source params_base.sh
+
 # Directories
 SCRIPTSDIR=.
-MUTEADIR=/home/mag50/workspace/mutea-autosomal/
-LOGDIR=/groups/reich/melissa/mutation_rate_project/analysis_round1/simulations/log
-OUTDIR=/groups/reich/melissa/mutation_rate_project/analysis_round1/simulations
-DATADIR=/groups/reich/melissa/mutation_rate_project/analysis_round1/simulations/simdata
+MUTEADIR=${HOME}/workspace/mutea-autosomal/
+LOGDIR=${BASEDIR}/simulations/log
+OUTDIR=${BASEDIR}/
+DATADIR=${BASEDIR}/simdata
 
 # Params
 NUMSIM=1000

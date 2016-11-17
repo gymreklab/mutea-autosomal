@@ -1,0 +1,1 @@
+BASEDIR=/groups/reich/melissa/mutation_rate_project/analysis_round1/
