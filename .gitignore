@@ -4,3 +4,4 @@
 *.pdf
 *.DS_Store
 analyses/data/simulations/
+analyses/data/ystr_validation/
