@@ -1,0 +1,7 @@
+##fileformat=VCFv4.1
+##INFO=<ID=MOTIF,Number=1,Type=String,Description="Canonical repeat motif">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of variant">
+##FORMAT=<ID=ALLREADS,Number=1,Type=String,Description="All reads aligned to locus">
+##FORMAT=<ID=GB,Number=1,Type=String,Description="Genotype given in bp difference from reference">
+##FORMAT=<ID=TGB,Number=1,Type=String,Description="Genotype given in bp difference from reference ground truth">
+##FORMAT=<ID=TMRCA,Number=1,Type=Float,Description="TMRCA between haplotypes">
