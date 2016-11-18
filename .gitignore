@@ -1,2 +1,6 @@
 *~
 *.ipynb_checkpoints*
+*pyc
+*.pdf
+*.DS_Store
+analyses/data/simulations/

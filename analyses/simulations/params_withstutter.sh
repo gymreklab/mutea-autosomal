@@ -6,8 +6,8 @@ source params_base.sh
 SCRIPTSDIR=.
 MUTEADIR=${HOME}/workspace/mutea-autosomal/
 LOGDIR=${BASEDIR}/simulations/log
-OUTDIR=${BASEDIR}/
-DATADIR=${BASEDIR}/simdata
+OUTDIR=${BASEDIR}/simulations/
+DATADIR=${BASEDIR}/simulations/simdata
 
 # Params
 NUMSIM=10

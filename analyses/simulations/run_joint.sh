@@ -18,9 +18,12 @@ do
 	    for ML in ${MAXLOCI}
 	    do
                 # Run joint estimation
-		bsub -q short -W 4:00 \
-		    -eo ${LOGDIR}/joint_${STEPPARAM}_${STR_MUT_RATE}_${LENC}_${ML}.err \
-		    -oo ${LOGDIR}/joint_${STEPPARAM}_${STR_MUT_RATE}_${LENC}_${ML}.out \
+#		bsub -q short -W 4:00 \
+#		    -eo ${LOGDIR}/joint_${STEPPARAM}_${STR_MUT_RATE}_${LENC}_${ML}.err \
+#		    -oo ${LOGDIR}/joint_${STEPPARAM}_${STR_MUT_RATE}_${LENC}_${ML}.out \
+		sbatch --partition=compute --account=${ACCOUNT} --get-user-env --time=60 \
+		    --error=${LOGDIR}/joint_${STEPPARAM}_${STR_MUT_RATE}_${LENC}_${ML}.err \
+		    --output=${LOGDIR}/joint_${STEPPARAM}_${STR_MUT_RATE}_${LENC}_${ML}.out \
 		    /home/mag50/workspace/MUTEA/main_autosomal.py \
 		    --asdhet ${OUTDIR}/${PREFIX}_asdhet.vcf.gz --vcf \
 		    --locus_priors ${OUTDIR}/${PREFIX}_maxlik.tab \
