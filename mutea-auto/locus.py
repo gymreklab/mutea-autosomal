@@ -18,8 +18,8 @@ import matrix_optimizer
 import read_str_vcf
 #import matrix_optimizer2
 
-sys.path.append("/home/mag50/workspace/cteam/mutation_models/")
-from ModelEstimatorTMRCA import *
+#sys.path.append("/home/mag50/workspace/cteam/mutation_models/")
+#from ModelEstimatorTMRCA import *
 
 SMALLNUM = 10e-200
 
@@ -146,23 +146,6 @@ class Locus:
         self.prior_logmu = _logmu
         self.prior_beta = _beta
         self.prior_pgeom = _pgeom
-
-    def GetCurveFit(self):
-        """ TODO remove, this is for testing """
-        asds = []
-        tmrcas = []
-        for dp in self.data:
-            tmrcas.append(dp[0])
-            asds.append((dp[1]-dp[2])**2)
-        estimator = LineFitEstimator()
-        estimator.SetNumBS(0)
-        estimator.SetEstEff(True)
-        estimator.SetCovar("identity")
-        estimator.SetPriors(mu=0.001, beta=0.3, step=0.9)
-        estimator.SetParams(strsd=1.1)
-        estimator.LoadData(asds=asds, tmrcas=tmrcas)
-        estimator.Predict()
-        return estimator
 
     def GetMaxTMRCA(self):
         return self.maxt
