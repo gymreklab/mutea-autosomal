@@ -1,3 +1,4 @@
+*#*
 *~
 *.ipynb_checkpoints*
 *pyc
@@ -6,3 +7,5 @@
 analyses/data/simulations/
 analyses/data/ystr_validation/
 analyses/data/autosomal_validation/
+analyses/data/autosomal_estimates/
+figures/plots
