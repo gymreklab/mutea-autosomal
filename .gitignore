@@ -8,4 +8,5 @@ analyses/data/simulations/
 analyses/data/ystr_validation/
 analyses/data/autosomal_validation/
 analyses/data/autosomal_estimates/
+simulations_joint/
 figures/plots
