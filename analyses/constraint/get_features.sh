@@ -29,4 +29,4 @@ intersectBed -a ${tmpdir}/lobstr_ref_features.bed -b ${tmpdir}/lobstr_ref_localf
     cut -f 10-12 --complement >> ${BASEDIR}/lobSTR_ref_GRCh37_properties.tab
 
 # Filter
-./filter_features.sh ${BASEDIR}/lobSTR_ref_GRCh37_properties.tab > ${BASEDIR}/lobSTR_ref_GRCh37_properties_filtered.tab
+./filter_features.py ${BASEDIR}/lobSTR_ref_GRCh37_properties.tab > ${BASEDIR}/lobSTR_ref_GRCh37_properties_filtered.tab
