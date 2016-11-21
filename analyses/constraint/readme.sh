@@ -4,12 +4,7 @@
 # Get genome-wide file with of features + observed rates
 ./get_features.sh params.sh
 
-cat features/lobSTR_ref_GRCh37_properties_filtered.tab | grep -v chrom | \
-    intersectBed -a ../perlocus/autosomal_estimates_ml_filtered.bed.gz -b stdin -wa -wb | \
-    cut -f 10-12 --complement > tmp
-echo "chrom,start,end,ml_mu,ml_beta,ml_p,ml_mu_stderr,numsamples,strfilter,motif,length,uninterrupted_length,recomb,gc,entropy,reptiming,featurefilter" | \
-    sed 's/,/\t/g' > autosomal_perlocus_observed.bed
-cat tmp >> autosomal_perlocus_observed.bed
+./combine_features_estimates.sh params.sh
 ##############################################################
 
 # Get set of loci to train on

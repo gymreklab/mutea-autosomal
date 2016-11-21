@@ -22,12 +22,12 @@ cat ${TORFILE} | sed 's/chr//' | intersectBed -a ${tmpdir}/lobstr_ref_canon.bed 
 
 # Combine
 echo "chrom,start,end,motif,length,uninterrupted_length,recomb,gc,entropy,reptiming" | \
-    sed 's/,/\t/g' > ${BASEDIR}/lobSTR_ref_GRCh37_properties.tab
+    sed 's/,/\t/g' > ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties.tab
 intersectBed -a ${tmpdir}/lobstr_ref_features.bed -b ${tmpdir}/lobstr_ref_localfeatures.bed -wa -wb -f 1 | \
     cut -f 7-9 --complement | \
     intersectBed -a stdin -b ${tmpdir}/lobstr_ref_reptiming.bed -wa -wb -f 1| \
-    cut -f 10-12 --complement >> ${BASEDIR}/lobSTR_ref_GRCh37_properties.tab
+    cut -f 10-12 --complement >> ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties.tab
 
 # Filter
-./filter_features.py ${BASEDIR}/lobSTR_ref_GRCh37_properties.tab > ${BASEDIR}/lobSTR_ref_GRCh37_properties_filtered.tab
-gzip ${BASEDIR}/lobSTR_ref_GRCh37_properties_filtered.tab
+./filter_features.py ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties.tab > ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties_filtered.tab
+gzip ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties_filtered.tab
