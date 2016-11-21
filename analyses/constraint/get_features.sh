@@ -10,7 +10,7 @@ source ${PARAMFILE}
 tmpdir=$(mktemp -d -p ${TMPLOC})
 
 # Motif, length, Uninterrupted track length
-cat ${LOBREF} | canon 15 > ${tmpdir}/lobstr_ref_canon.bed
+cat ${LOBREF} | ./canon 15 > ${tmpdir}/lobstr_ref_canon.bed
 ./get_motif_length_features.py ${tmpdir}/lobstr_ref_canon.bed ${REFDB} > ${tmpdir}/lobstr_ref_features.bed
 
 # Recombination, GC, entropy
