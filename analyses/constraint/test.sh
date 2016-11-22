@@ -6,7 +6,7 @@ NUMSIM=10
 BATCHSIZE=1
 PREDFILE=test.bed
 
-# Simulate new haplotype values based on predicted, automatically batch - TODO
+# Simulate new haplotype values based on predicted, automatically batch
 mkdir -p ${BASEDIR}/constraint/batches
 ./simulate_constraint_nulls.py \
     --asdhet ${DATADIR}/ \
