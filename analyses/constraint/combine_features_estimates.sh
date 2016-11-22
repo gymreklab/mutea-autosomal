@@ -11,4 +11,4 @@ zcat ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties_filtered.tab | grep -v c
 echo "chrom,start,end,ml_mu,ml_beta,ml_p,ml_mu_stderr,numsamples,strfilter,motif,length,uninterrupted_length,recomb,gc,entropy,reptiming,featurefilter" | \
     sed 's/,/\t/g' > ${BASEDIR}/constraint/autosomal_perlocus_observed.bed
 cat ${tmpdir}/tmp >> ${BASEDIR}/constraint/autosomal_perlocus_observed.bed
-gzip ${BASEDIR}/constraint/autosomal_perlocus_observed.bed
+gzip -f ${BASEDIR}/constraint/autosomal_perlocus_observed.bed

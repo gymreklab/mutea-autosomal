@@ -30,4 +30,4 @@ intersectBed -a ${tmpdir}/lobstr_ref_features.bed -b ${tmpdir}/lobstr_ref_localf
 
 # Filter
 ./filter_features.py ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties.tab > ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties_filtered.tab
-gzip ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties_filtered.tab
+gzip -f ${BASEDIR}/constraint/lobSTR_ref_GRCh37_properties_filtered.tab
