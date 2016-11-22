@@ -29,53 +29,68 @@ def GetUninterruptedLength_(seq, motif):
     ind = seq.find(motif, loc) # get first one
     if ind != -1:
         starts.append(ind)
-        loc = ind + len(motif)-1
+        loc = ind + len(motif)
+#    print "starts", starts
     while True:
+#        print "looking"
         ind = seq.find(motif, loc)
         if ind == -1: # didn't find anymore, end run
             if len(starts) > 0:
-                ends.append(min([loc+len(motif), len(seq)]))
+                ends.append(loc-1)
             break
-        if ind > loc+1: # imperfect, end run and start new one
-            ends.append(min([loc, len(seq)]))
+#        print "ind, loc", ind, loc
+        if ind > loc: # imperfect, end run and start new one
+            ends.append(min([loc-1, len(seq)-1]))
             starts.append(ind)
         loc = ind + len(motif)
+#        print "starts, ends",  starts, ends
     intervals = zip(starts, ends)
     intervals = map(list, intervals)
+#    print "intervals", intervals
     # For each interval, try to extend
     maxlen = 0
     bestint = [-1, -1]
     for i in range(len(intervals)):
-        subseq = seq[intervals[i][0]:intervals[i][1]-1]
+        subseq = seq[intervals[i][0]:intervals[i][1]+1]
+#        print "i, subseq", i, subseq, intervals[i]
         prefix = seq[max([intervals[i][0]-len(motif), 0]):intervals[i][0]]
-        suffix = seq[intervals[i][1]:min([intervals[i][1]+len(motif), len(seq)-1])]
+        suffix = seq[intervals[i][1]+1:min([intervals[i][1]+1+len(motif), len(seq)])]
         length = intervals[i][1]-intervals[i][0] # full match
         for j in range(1, len(motif)+1): # match prefix
             if len(prefix) < j: break
+#            print "prefix", j, prefix[-1*j], motif[-1*j]
             if prefix[-1*j] == motif[-1*j]:
                 intervals[i][0] -= 1
             else:
                 break
         for j in range(len(motif)): # match suffix
             if len(suffix) <= j: break
+#            print "suffix", j, motif[j], suffix[j]
             if suffix[j] == motif[j]:
                 intervals[i][1] += 1
             else:
                 break
-        if intervals[i][1]-intervals[i][0] > maxlen:
-            maxlen = intervals[i][1]-intervals[i][0]
+#        print "extended", seq[intervals[i][0]:intervals[i][1]+1]
+        if intervals[i][1]-intervals[i][0]+1 > maxlen:
+            maxlen = intervals[i][1]-intervals[i][0]+1
             bestint = intervals[i]
+#    print bestint, maxlen, seq[bestint[0]:bestint[1]+1]
     return maxlen
 
-#seq="TTTAGTTTATTTTTTATTTTTATTTATTTATTTATTTATTT"
-#motif="ATTT"
-#GetUninterruptedLength_(seq, motif)
-#seq="ATATATATATATATAT"
-#motif="AT"
-#GetUninterruptedLength_(seq, motif)
-#seq="TGTGTGTGTGTG"
-#motif="GT"
-#GetUninterruptedLength_(seq, motif)
+def test():
+    seq="TTTAGTTTATTTTTTATTTTTATTTATTTATTTATTTATTT"
+    motif="ATTT"
+    assert GetUninterruptedLength_(seq, motif) == 23
+    seq="ATATATATATATATAT"
+    motif="AT"
+    assert GetUninterruptedLength_(seq, motif) == 16
+    seq="TGTGTGTGTGTG"
+    motif="GT"
+    assert GetUninterruptedLength_(seq, motif) == 12
+    seq="TCTTTCTTTCTCCTTTTCTTCTCTTTTCTTTCTTTCTTTTCTTTCTTTCTTCTTCGTTCTTTC"
+    motif=ReverseComplement("AAAG")
+    assert GetUninterruptedLength_(seq, motif) == 15
+#test()
 #sys.exit(1)
 
 def GetUninterruptedLength(chrom, start, end, motif, genome):
