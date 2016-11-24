@@ -9,5 +9,7 @@ analyses/data/ystr_validation/
 analyses/data/autosomal_validation/
 analyses/data/autosomal_estimates/
 analyses/data/constraint/
+analyses/data/strsets/
 simulations_joint/
 figures/plots
+scratch.ipynb
