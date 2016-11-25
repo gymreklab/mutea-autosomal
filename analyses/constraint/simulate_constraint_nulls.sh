@@ -6,13 +6,14 @@ NUMSIM=10
 BATCHSIZE=1
 PREDFILE=
 
+# Batch loci - TODO
+
 # Simulate new haplotype values based on predicted, automatically batch - TODO
 mkdir -p ${BASEDIR}/constraint/batches
 ./simulate_constraint_nulls.py \
     --asdhet ${DATADIR}/ \
     --pred ${PREDFILE} \
     --numsim ${NUMSIM} \
-    --batchsize ${BATCHSIZE} \
     --outdir ${BASEDIR}/constraint/batches
 
 

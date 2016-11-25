@@ -249,10 +249,11 @@ class Locus:
                 else:
                     tmrcas = read_str_vcf.get_sample_tmrcas(reader, uselocus=(self.chrom, self.start, self.end))
                     for sample in str_gts:
-                        if len(str_gts[sample].keys()) > 0:
+                        if len(str_gts[sample].keys()) > 0 and sample in tmrcas.keys():
                             self.data.append((tmrcas[sample], str_gts[sample]))
-                        else:
-                            MSG("Skipping sample %s"%sample)
+                if len(self.data) < self.minsamples: return
+#                        else:
+#                            MSG("Skipping sample %s"%sample)
                 #### DEBUG TODO REMOVE ####
 #                print "lendata", len(self.data), motif_len, min_str, max_str, max(tmrcas.values())
 #                success, str_gts2, min_str, max_str, locus, motif_len = \

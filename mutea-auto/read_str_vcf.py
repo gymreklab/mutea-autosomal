@@ -86,6 +86,8 @@ def get_sample_tmrcas(vcf_reader, uselocus=None):
         try:
             tmrcas[sample.sample] = int(sample["TMRCA"])
         except: ERROR("No TMRCA field found")
+        if tmrcas[sample.sample] < 0:
+            del tmrcas[sample.sample]
     return tmrcas
 
 def get_str_gts_diploid(vcf_reader, uselocus=None):
