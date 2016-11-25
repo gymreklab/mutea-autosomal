@@ -6,8 +6,10 @@ TORFILE=/groups/reich/melissa/mutation_rate_project/analysis_round1/autosomal_es
 INTERGENIC=/groups/reich/melissa/mutation_rate_project/autosomal_byclass/explore_classes/lobSTR_ref_GRCh37_intergenic.bed
 
 BASEDIR=/groups/reich/melissa/mutation_rate_project/analysis_round1/
-PREDFILE=${BASEDIR}/constraint/autosomal_perlocus_estimates.bed
-#DATADIR=/oasis/projects/nsf/ddp268/mgymrek/mutea-autosomal/sgdp_asdt_vcf
+PREDFILE=/groups/reich/melissa/mutation_rate_project/analysis_round1/constraint/autosomal_perlocus_estimates.bed
 
+#DATADIR=/oasis/projects/nsf/ddp268/mgymrek/mutea-autosomal/sgdp_asdt_vcf
+DATADIR=/groups/reich/melissa/mutation_rate_project/sgdp_asdt_vcf
 NUMSIM=10 # For making null, how many samples to draw
 BATCHSIZE=100 # Number of loci to include in each batch for making the null. Actual Mutea batch size is $NUMSIM*$BATCHSIZE
+SCALE=0.47

@@ -259,15 +259,15 @@ def main():
 
     # Run estimation
     if args.joint:
-        jlocus = jointlocus.JointLocus(loci, _ires=args.ires, _numproc=args.numproc)
+        jlocus = jointlocus.JointLocus(loci, _ires=None, _numproc=args.numproc)
         jlocus.SetPriors(jpriors)
         MSG("[main_autosomal.py] Processing joint locus with %s loci... (%s max)"%(len(jlocus.loci), args.maxloci))
         jlocus.MaximizeLikelihood(mu_bounds=(args.min_mu, args.max_mu), \
-                                      sd_bounds=(args.min_sd, args.max_sd), \
+                                      sd_bounds=(None, None), \
                                       beta_bounds=(args.min_beta, args.max_beta), \
                                       pgeom_bounds=(args.min_pgeom, args.max_pgeom), \
                                       lencoeff_bounds=(args.min_lencoeff, args.max_lencoeff), \
-                                      drawmu=args.drawmu, \
+                                      drawmu=False, \
                                       debug=args.debug)
         jlocus.PrintResults(output)
     else:
