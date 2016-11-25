@@ -15,8 +15,3 @@
 # Build model
 runipy BuildConstraintModel.ipynb
 ##############################################################
-
-##############################################################
-# Simulations to get null - TODO
-#./simulate_constraint_nulls.sh params.sh
-##############################################################
