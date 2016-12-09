@@ -11,6 +11,7 @@ analyses/data/autosomal_estimates/
 analyses/data/constraint/
 analyses/data/strsets/
 analyses/data/constraint_strsets/
+analyses/data/suppdata/
 simulations_joint/
 figures/plots
 scratch.ipynb
