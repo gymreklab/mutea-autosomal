@@ -9,3 +9,6 @@ scp ${HOST}:${HOSTBASEDIR}/ystr_validation/ystrs_1kg_calibrate_errors.tab ${DATA
 scp ${HOST}:${HOSTBASEDIR}/ystr_validation/ystrs_sgdp_calibrate_errors_np.tab ${DATADIR}/ystr_validation
 scp ${HOST}:${HOSTBASEDIR}/ystr_validation/ystrs_1kg_calibrate_errors_np.tab ${DATADIR}/ystr_validation
 
+scp ${HOST}:${HOSTBASEDIR}/ystr_validation/ystrs_sgdp_smm.tab ${DATADIR}/ystr_validation
+scp ${HOST}:${HOSTBASEDIR}/ystr_validation/ystrs_1kg_smm.tab ${DATADIR}/ystr_validation
+
