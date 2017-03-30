@@ -22,3 +22,8 @@ sbatch --job-name=1kgy.ml --time 2000 --partition=compute \
 # Calibrate errors
 ./calibrate_errors.sh sgdp_params.sh
 ./calibrate_errors.sh 1kg_params.sh
+
+
+######## Try Y-STRs using SMM
+./run_ystr_estimation_smm.sh 1kg_params.sh
+./run_ystr_estimation_smm.sh sgdp_params.sh

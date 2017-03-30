@@ -16,6 +16,7 @@ import genotypers
 from mutation_model import OUGeomSTRMutationModel
 import matrix_optimizer
 import read_str_vcf
+import statsmodels.api as sm
 #import matrix_optimizer2
 
 #sys.path.append("/home/mag50/workspace/cteam/mutation_models/")
@@ -95,6 +96,10 @@ def GenerateMutationModel(locilist, mu, beta, pgeom, len_coeff=0, a0=0, debug=Fa
     mut_model = OUGeomSTRMutationModel(pgeom, 10**mu, beta, allele_range, len_coeff=len_coeff, a0=a0)
     return mut_model, allele_range
 
+class Results:
+    def __init__(self):
+        self.x = [None, None, None]
+
 class Locus:
     def __init__(self, _chrom, _start, _end, _datafiles, \
                      _minsamples, _maxsamples, _stderrs_method, _isvcf, _eststutter, _debug=False):
@@ -134,6 +139,8 @@ class Locus:
         self.features = []
         # Other params
         self.maxoutframe = 100 # No threshold for now
+        # Model
+        self.usesmm = False
         
     def LoadStutter(self, up, down, p):
         self.stutter_model = [up, down, p]
@@ -210,32 +217,6 @@ class Locus:
                                                                                                          down, \
                                                                                                          up, diploid=diploid)
                     if len(str_gts.keys()) < self.minsamples: return
-                    ##########
-                    # Filter things whose ML genotype doesn't match lobSTR call
-                    # These are usually from alignment errors filtered using --min-het-freq
-                    # TODO working on this
-                    """
-                    success, str_gts_lob, min_str, max_str, locus, motif_len = \
-                        read_str_vcf.get_str_gts_diploid(reader, uselocus=(self.chrom, self.start, self.end))
-                    if not success: return
-                    rmsamples = set()
-                    for sample in str_gts:
-                        max_gt_st = max(str_gts[sample].iteritems(), key=operator.itemgetter(1))[0]
-                        for gt in max_gt_st:
-                            rc = read_count_dict[sample][gt+center]
-                            if rc <= 1:
-                                MSG("Removing sample %s allele %s, max_gt_st=%s, reads=%s"%(sample, gt, max_gt_st, read_count_dict[sample]))
-                                rmsamples.add(sample)
-                            else:
-                                MSG("Keeping sample %s allele %s, max_gt_st=%s, reads=%s"%(sample, gt, max_gt_st, read_count_dict[sample]))
-#                        max_gt_lob = max(str_gts_lob[sample].iteritems(), key=operator.itemgetter(1))[0]
-#                        if max_gt_st != max_gt_lob:
-#                            MSG("Removing sample %s, max_gt_st=%s, max_gt_lob=%s, reads=%s"%(sample, max_gt_st, max_gt_lob, read_count_dict[sample]))
-#                            rmsamples.append(sample)
-                    for sample in rmsamples: del str_gts[sample]
-                    if len(str_gts.keys()) < self.minsamples: return
-                    """
-                    ##########
                 else:
                     success, str_gts, min_str, max_str, locus, motif_len = \
                         read_str_vcf.get_str_gts_diploid(reader, uselocus=(self.chrom, self.start, self.end))
@@ -252,19 +233,6 @@ class Locus:
                         if len(str_gts[sample].keys()) > 0 and sample in tmrcas.keys():
                             self.data.append((tmrcas[sample], str_gts[sample]))
                 if len(self.data) < self.minsamples: return
-#                        else:
-#                            MSG("Skipping sample %s"%sample)
-                #### DEBUG TODO REMOVE ####
-#                print "lendata", len(self.data), motif_len, min_str, max_str, max(tmrcas.values())
-#                success, str_gts2, min_str, max_str, locus, motif_len = \
-#                    read_str_vcf.get_str_gts_diploid(reader, uselocus=(self.chrom, self.start, self.end))
-#                for sample in str_gts:
-#                    max_gt1 = max(str_gts[sample].iteritems(), key=operator.itemgetter(1))[0]
-#                    max_gt2 = max(str_gts2[sample].iteritems(), key=operator.itemgetter(1))[0]
-#                    if max_gt1 != max_gt2:
-#                    print sample, read_count_dict[sample], map(lambda x: x-2, max_gt1), map(lambda x: x-2, max_gt2), str_gts2[sample][max_gt2], str_gts[sample][max_gt1]
-#                sys.exit(1)
-                ###########################
                 # Set metadata
                 self.minstr = min_str
                 self.maxstr = max_str
@@ -364,6 +332,31 @@ class Locus:
         # Calculate negative likelihood
         ll = self.DetermineTotalLogLikelihood(allele_range+mut_model.max_step, mut_model, optimizer, keep)
         return -1*ll
+
+    def SMM(self, debug=False):
+        self.LoadData()
+        if len(self.data) < self.minsamples: return
+        # Prepare data vectors
+        asds = []
+        tmrcas = []
+        for sample in self.data:
+            if len(sample) == 2:
+                tmrca, gtpost = sample
+                asdprobs = self.GetASDProbs(gtpost)
+            else:
+                tmrca, a1, a2, asd = sample
+                asdprobs = {asd: 1}
+            asd = max(asdprobs.iterkeys(), key=(lambda key: asdprobs[key]))
+            tmrcas.append(tmrca)
+            asds.append(asd)
+        # Linear regression between asd and tmrca, force intercept to 0
+        mod_ols = sm.OLS(asds, tmrcas)
+        res_ols = mod_ols.fit()
+        res = Results()
+        res.x = [np.log10(res_ols.params[0]), 0, 0]
+        self.best_res = res
+        self.stderr = [np.log10(res_ols.bse[0])]
+        return
 
     def MaximizeLikelihood(self, mu_bounds=None, beta_bounds=None, pgeom_bounds=None, lencoeff_bounds=None, \
                                debug=False, jackknife=False, jkind=[]):

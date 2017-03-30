@@ -108,11 +108,11 @@ def LoadStutter(sfile):
 def LoadLoci(locfile, datafiles, minsamples, maxsamples, \
                  locuspriors, locusfeatures, use_features, \
                  stderrs, jackknife_blocksize, isvcf, eststutter, usestutter, \
-                 use_sample_pairs, use_locus_means, \
+                 use_sample_pairs, use_locus_means, usesmm, \
                  debug=False):
     sys.stderr.write("Loading priors\n")
     priors = LoadPriors(locuspriors, use_locus_means, locfile)
-    sys.stderr.write("LOading features\n")
+    sys.stderr.write("Loading features\n")
     features = LoadLocusFeatures(locusfeatures, locfile, use_features=use_features)
     sys.stderr.write("Loading stutter\n")
     stutter = LoadStutter(usestutter)
@@ -126,6 +126,7 @@ def LoadLoci(locfile, datafiles, minsamples, maxsamples, \
             loc = locus.Locus(chrom, start, end, datafiles, minsamples, maxsamples, \
                                   stderrs, isvcf, eststutter, _debug=debug)
             loc.jkblocksize = jackknife_blocksize
+            loc.usesmm = usesmm
             key = (chrom, start, end)
             if priors is not None and key not in priors: continue
             if features is not None and key not in features: continue
@@ -153,6 +154,8 @@ def MSG(msg):
 def RunLocus(locus, args=None):
     if args.only_stutter:
         locus.LoadData()
+    elif locus.usesmm:
+        locus.SMM(debug=args.debug)
     else:
         locus.MaximizeLikelihood(mu_bounds=(args.min_mu, args.max_mu), \
                                      beta_bounds=(args.min_beta, args.max_beta), \
@@ -204,6 +207,7 @@ def main():
     parser.add_argument("--jackknife_blocksize", required=False, type=int, default=10, help="Jackknife block size.")
     parser.add_argument("--min_lencoeff", required=False, type=float, default=0.0, help="Lower optimization boundary for lencoeff.")
     parser.add_argument("--max_lencoeff", required=False, type=float, default=0.0, help="Upper optimization boundary for lencoeff.")
+    parser.add_argument("--smm", help="Assume an SMM model, perform simple linear fit", action="store_true")
 
     # Joint estimation options
     parser.add_argument("--joint", help="Estimate parameters jointly across loci", action="store_true")
@@ -236,7 +240,7 @@ def main():
                         args.locus_priors, args.locus_features, args.use_features, \
                         args.stderrs, args.jackknife_blocksize, args.vcf, args.eststutter, \
                         args.usestutter, \
-                        args.use_sample_pairs, args.use_locus_means, \
+                        args.use_sample_pairs, args.use_locus_means, args.smm, \
                         debug=args.debug)
     if len(loci) > args.maxloci: loci = loci[:args.maxloci]
 

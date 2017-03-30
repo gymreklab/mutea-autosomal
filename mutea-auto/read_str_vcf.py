@@ -273,4 +273,4 @@ def counts_to_centalized_posteriors(sample_read_counts, p_geom, down, up, diploi
         norm_gt_posteriors[sample] = new_posteriors
     if diploid:
         return norm_gt_posteriors,min_allele-center,max_allele-center,center
-    else: return norm_gt_posteriors,min_allele-center,max_allele-center
+    else: return norm_gt_posteriors,min_allele-center,max_allele-center,center
