@@ -51,7 +51,9 @@ def PlotSimulations(dfs, outfile=None, estcolors=["blue","red","green"]):
 
 def LoadMLData(datafile):
     data = pd.read_csv(datafile, sep="\t", names=["chrom","start","end","est_logmu_ml","est_beta_ml","est_pgeom_ml","stderr_ml","numsamples_ml","filter"])
-    data["est_beta_eff_ml"] = data.apply(lambda x: x.est_beta_ml/((2-x.est_pgeom_ml)/x.est_pgeom_ml**2), 1)
+    if max(data.est_pgeom_ml)>0:
+        data["est_beta_eff_ml"] = data.apply(lambda x: x.est_beta_ml/((2-x.est_pgeom_ml)/x.est_pgeom_ml**2), 1)
+    else: data["est_beta_eff_ml"] = 0
     return data[["chrom","start","end","est_logmu_ml","est_beta_eff_ml","est_beta_ml", "est_pgeom_ml","stderr_ml","numsamples_ml"]]
             
 def LoadML(estfile, truthfile, strsdfile, minmu=10e-9):
