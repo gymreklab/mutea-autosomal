@@ -4,6 +4,9 @@
 # Run autosomal estimates - maxlik
 ./run_autosomal_ml.sh params.sh
 
+# Run autosomal estimates - smm
+./run_autosomal_smm.sh params.sh
+
 # Combine results while still running so we can peek
 ./gather_completed.sh params.sh
 

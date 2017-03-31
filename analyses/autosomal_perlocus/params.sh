@@ -1,6 +1,7 @@
 #!/bin/bash
 
-MUTEADIR=${HOME}/workspace/mutea-anutosomal/
+ACCOUNT=ddp268
+MUTEADIR=${HOME}/workspace/mutea-autosomal/
 
 # On orchestra:
 #BASEDIR=/groups/reich/melissa/mutation_rate_project/analysis_round1/autosomal_estimates
@@ -16,7 +17,10 @@ TMPLOC=/oasis/scratch/comet/mgymrek/temp_project
 
 NUMLINES=5000 # Break to batches of this many
 LOCDIR=${BASEDIR}/getloci/batches/
+
 OUTDIR=${BASEDIR}/batches_ml/
 LOGDIR=${BASEDIR}/log_ml/
 
+OUTDIRSMM=${BASEDIR}/batches_smm/
+LOGDIRSMM=${BASEDIR}/log_smm/
 
