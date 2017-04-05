@@ -13,3 +13,4 @@
 # Filter and scale
 #bsub -q short -W 4:00 -eo filter.err -oo filter.log \
 ./filter.sh params.sh
+./filter_smm.sh params.sh

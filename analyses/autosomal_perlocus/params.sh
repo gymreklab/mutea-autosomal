@@ -10,10 +10,16 @@ MUTEADIR=${HOME}/workspace/mutea-autosomal/
 #TMPLOC=/n/scratch2/gymrek
 
 # On comet:
-BASEDIR=/oasis/projects/nsf/ddp268/mgymrek/mutea-autosomal/autosomal_estimates
-DATADIR=/oasis/projects/nsf/ddp268/mgymrek/mutea-autosomal/sgdp_asdt_vcf
-LOBREF=/oasis/projects/nsf/ddp268/mgymrek/dbase/lobstr/lobstr_v3.0.2_hg19_ref_nochr.bed
-TMPLOC=/oasis/scratch/comet/mgymrek/temp_project
+#BASEDIR=/oasis/projects/nsf/ddp268/mgymrek/mutea-autosomal/autosomal_estimates
+#DATADIR=/oasis/projects/nsf/ddp268/mgymrek/mutea-autosomal/sgdp_asdt_vcf
+#LOBREF=/oasis/projects/nsf/ddp268/mgymrek/dbase/lobstr/lobstr_v3.0.2_hg19_ref_nochr.bed
+#TMPLOC=/oasis/scratch/comet/mgymrek/temp_project
+
+# On snorlax:
+BASEDIR=/storage/mgymrek/mutea-autosomal/autosomal_estimates
+DATADIR=/storage/mgymrek/mutea-autosomal/sgdp_asdt_vcf
+LOBREF=/storage/resources/datasets/lobstr/hg19/lobstr_v3.0.2_hg19_ref_nochr.bed
+TMPLOC=/tmp
 
 NUMLINES=5000 # Break to batches of this many
 LOCDIR=${BASEDIR}/getloci/batches/

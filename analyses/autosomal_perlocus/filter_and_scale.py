@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+LOBREF="/storage/resources/datasets/lobstr/hg19/lobstr_v3.0.2_hg19_ref_nochr.bed"
 import argparse
 import os
 import numpy as np
@@ -59,6 +60,7 @@ def main():
 
     # Set stderr nan to -1 so we know who they are
     data.ix[np.isnan(data["est_logmu_stderr"]), "est_logmu_stderr"] = -1 # set to -1, will filter later
+    data.ix[np.isinf(data["est_logmu_stderr"]), "est_logmu_stderr"] = -1 # set to -1, will filter later
     sys.stderr.write("after filter stderr %s\n"%data.shape[0])
 
     # Scale mutation rates using CODIS scaling factor

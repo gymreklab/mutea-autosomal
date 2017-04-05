@@ -9,6 +9,11 @@ cat ${LOGDIR}/*.err | grep PROGRESS | awk '(NF==9)' | sed 's/PROGRESS: //' | gre
     bedtools sort -i stdin | uniq | bgzip -c > ${BASEDIR}/autosomal_estimates_ml.bed.gz
 tabix -p bed ${BASEDIR}/autosomal_estimates_ml.bed.gz
 
+echo "gather estimates...SMM"
+cat ${LOGDIRSMM}/*.err | grep PROGRESS | awk '(NF==9)' | sed 's/PROGRESS: //' | grep -v "PROGRESS: PROGRESS:" | \
+    bedtools sort -i stdin | uniq | bgzip -c > ${BASEDIR}/autosomal_estimates_smm.bed.gz
+tabix -p bed ${BASEDIR}/autosomal_estimates_smm.bed.gz
+
 # Stutter
 echo "gathering stutter..."
 cat ${LOGDIR}/*.err | \
