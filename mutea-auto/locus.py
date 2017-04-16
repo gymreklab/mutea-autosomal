@@ -353,7 +353,7 @@ class Locus:
         mod_ols = sm.OLS(asds, tmrcas)
         res_ols = mod_ols.fit()
         res = Results()
-        res.x = [np.log10(res_ols.params[0]), 0, 0]
+        res.x = [np.log10(res_ols.params[0]/2), 0, 0]
         self.best_res = res
         self.stderr = [np.log10(res_ols.bse[0])]
         return
@@ -473,9 +473,12 @@ class Locus:
         outfile.write(self.GetResultsString())
         outfile.flush()
 
-    def GetResultsString(self):
+    def GetResultsString(self, include_likelihood=False):
         if self.best_res is None: return ""
-        return "\t".join(map(str, [self.chrom, self.start, self.end]+list(self.best_res.x) + self.stderr + [self.numsamples]))+"\n"
+        likelihoodval = []
+        if include_likelihood:
+            likelihoodval = [self.best_res.fun]
+        return "\t".join(map(str, [self.chrom, self.start, self.end]+list(self.best_res.x) + self.stderr + [self.numsamples] + likelihoodval))+"\n"
 
     def GetStutterString(self):
         if self.stutter_model is not None:
