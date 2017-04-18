@@ -163,7 +163,7 @@ def RunLocus(locus, args=None):
                                      lencoeff_bounds=(args.min_lencoeff, args.max_lencoeff), \
                                      debug=args.debug)
     # Print intermediate results to stderr so we can track
-    outline = locus.GetResultsString()
+    outline = locus.GetResultsString(include_likelihood=args.output_likelihood)
     # Print stutter results
     if locus.eststutter is not None:
         stutterline = locus.GetStutterString()
@@ -217,6 +217,8 @@ def main():
     parser.add_argument("--use_features", help="List of feature numbers to use. (default all)", type=str)
     parser.add_argument("--use_locus_means", help="Use mean of per-locus beta and p, rather than individual locus estimates", action="store_true")
 
+    # Other options
+    parser.add_argument("--output-likelihood", help="Add a column to the output with the model likelihood", action="store_true")
     args = parser.parse_args()
     ############################
     # Check options

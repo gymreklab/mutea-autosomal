@@ -25,5 +25,9 @@ sbatch --job-name=1kgy.ml --time 2000 --partition=compute \
 
 
 ######## Try Y-STRs using SMM
+# For comparing mutation rates
 ./run_ystr_estimation_smm.sh 1kg_params.sh
 ./run_ystr_estimation_smm.sh sgdp_params.sh
+
+# For analyzing AIC
+./run_ystr_AIC.sh sgdp_params.sh
