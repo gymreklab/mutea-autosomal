@@ -15,3 +15,10 @@ analyses/data/suppdata/
 simulations_joint/
 figures/plots
 scratch.ipynb
+*FigureX*
+all_str_genes.txt
+bottom_constrained.txt
+gene2go
+go-basic.obo
+goslim_generic.obo
+top_constrained.txt
