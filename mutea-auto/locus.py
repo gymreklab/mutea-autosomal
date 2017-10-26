@@ -102,7 +102,7 @@ class Results:
 
 class Locus:
     def __init__(self, _chrom, _start, _end, _datafiles, \
-                     _minsamples, _maxsamples, _stderrs_method, _isvcf, _eststutter, _debug=False):
+                     _minsamples, _maxsamples, _stderrs_method, _isvcf, _eststutter, _uselikelihoods, _debug=False):
         self.chrom = _chrom
         self.start = _start
         self.end = _end
@@ -113,6 +113,7 @@ class Locus:
         self.jkblocksize = 10
         self.isvcf = _isvcf
         self.eststutter = _eststutter
+        self.uselikelihoods = _uselikelihoods
         self.debug = _debug
         self.data = []
         self.data_debug = []
@@ -182,7 +183,14 @@ class Locus:
                     x = reader.fetch(self.chrom, self.start, self.end)
                 except ValueError: continue
                 # Adjust for stutter
-                if self.eststutter is not None:
+                if self.uselikelihoods:
+                    # Get posteriors
+                    success, str_gts, min_str, max_str, center, motif_len = \
+                        read_str_vcf.likelihoods_to_centralized_posteriors(reader, (self.chrom, self.start, self.end))
+                    if not success: return
+                    # Skip loci with large fractions of samples with out-of-frame reads - TODO? - not implemented above
+                    if len(str_gts.keys()) < self.minsamples: return
+                elif self.eststutter is not None:
                     # Load genotypes
                     success, chrom, start, end, motif_len, read_count_dict, \
                         in_frame_count, out_frame_count, locus = \
@@ -190,7 +198,7 @@ class Locus:
                     if not success: return
                     # Skip loci with large fractions of samples with out-of-frame reads
                     if 100.0*out_frame_count/(in_frame_count+out_frame_count) > self.maxoutframe:
-                        continue
+                        return
                     if len(read_count_dict.values()) == 0: return
                     if self.use_sample_pairs:
                         diploid = False
@@ -360,6 +368,7 @@ class Locus:
 
     def MaximizeLikelihood(self, mu_bounds=None, beta_bounds=None, pgeom_bounds=None, lencoeff_bounds=None, \
                                debug=False, jackknife=False, jkind=[]):
+        if debug: MSG("Loading data...")
         if not jackknife:
             self.LoadData()
             if len(self.data) < self.minsamples: return
@@ -378,8 +387,10 @@ class Locus:
                                                            mut_model=None, allele_range=None, optimizer=None, debug=debug))
 
         # Optimize likelihood
-        if debug: callback = self.callback_function
-        else: callback = None
+        if debug: MSG("Max likelihood...")
+#        if debug: callback = self.callback_function
+#        else: callback = None
+        callback = None
         best_res = None
         for i in xrange(self.numiter):
             while True:
@@ -392,6 +403,7 @@ class Locus:
                                               options={'maxiter': self.max_cycle_per_iter, 'xtol': 0.001, 'ftol':0.001})
             if best_res is None or (res.success and res.fun < best_res.fun):
                 best_res = res
+        if debug: MSG("Standard errors...")
         if jackknife:
             return best_res.x
         else:

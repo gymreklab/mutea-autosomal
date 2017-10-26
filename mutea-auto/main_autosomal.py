@@ -107,7 +107,7 @@ def LoadStutter(sfile):
 
 def LoadLoci(locfile, datafiles, minsamples, maxsamples, \
                  locuspriors, locusfeatures, use_features, \
-                 stderrs, jackknife_blocksize, isvcf, eststutter, usestutter, \
+                 stderrs, jackknife_blocksize, isvcf, eststutter, usestutter, uselikelihoods, \
                  use_sample_pairs, use_locus_means, usesmm, \
                  debug=False):
     sys.stderr.write("Loading priors\n")
@@ -124,7 +124,7 @@ def LoadLoci(locfile, datafiles, minsamples, maxsamples, \
             start = int(start)
             end = int(end)
             loc = locus.Locus(chrom, start, end, datafiles, minsamples, maxsamples, \
-                                  stderrs, isvcf, eststutter, _debug=debug)
+                                  stderrs, isvcf, eststutter, uselikelihoods, _debug=debug)
             loc.jkblocksize = jackknife_blocksize
             loc.usesmm = usesmm
             key = (chrom, start, end)
@@ -152,8 +152,9 @@ def MSG(msg):
     sys.stderr.write(msg.strip() + "\n")
 
 def RunLocus(locus, args=None):
+    if args.debug: MSG("Running locus: %s:%s"%(locus.chrom, locus.start))
     if args.only_stutter:
-        locus.LoadData()
+        locus.LoadData(debug=args.debug)
     elif locus.usesmm:
         locus.SMM(debug=args.debug)
     else:
@@ -191,6 +192,7 @@ def main():
     parser.add_argument("--eststutter", help="Estimate stutter model from reads", type=str)
     parser.add_argument("--usestutter", help="Use previously estimated stutter model", type=str)
     parser.add_argument("--only-stutter", help="Only estimate stutter noise.", action="store_true")
+    parser.add_argument("--use-likelihoods", help="Don't calculate stutter. Use precalculated likelihoods in VCF.", action="store_true")
 
     # Filtering options
     parser.add_argument("--min_samples", help="Don't process if less than this many samples", type=int, default=50)
@@ -241,7 +243,7 @@ def main():
     loci = LoadLoci(args.loci, asdhet, args.min_samples, args.max_samples, \
                         args.locus_priors, args.locus_features, args.use_features, \
                         args.stderrs, args.jackknife_blocksize, args.vcf, args.eststutter, \
-                        args.usestutter, \
+                        args.usestutter, args.use_likelihoods, \
                         args.use_sample_pairs, args.use_locus_means, args.smm, \
                         debug=args.debug)
     if len(loci) > args.maxloci: loci = loci[:args.maxloci]

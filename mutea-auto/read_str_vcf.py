@@ -11,6 +11,59 @@ def ERROR(msg):
     sys.stderr.write(msg.strip() + "\n")
     sys.exit(1)
 
+def likelihoods_to_centralized_posteriors(vcf_reader, uselocus):
+    # initialize outputs
+    success = False
+    str_gts = {}
+    min_str = None
+    max_str = None
+    center = None
+    motif_len = None
+    errvals = success, str_gts, min_str, max_str, center, motif_len
+
+    # Attempt to read record from VCF
+    loci = list(vcf_reader.fetch(*uselocus))
+    loci = [locus for locus in loci if locus.POS == uselocus[1]]
+    if len(loci) != 1:
+        return errvals
+    record = loci[0]
+    
+    # Compute genotype posteriors
+    likelihood_genotyper = genotypers.LikelihoodGenotyper()
+    gt_posteriors = {}
+    motif_len = record.INFO["PERIOD"]
+    for sample in record:
+        if sample["GL"] is not None:
+            gt_posteriors[sample.sample] = likelihood_genotyper.get_genotype_posteriors(motif_len, record.INFO["BPDIFFS"], sample["GL"])
+            if len(gt_posteriors[sample.sample].keys()) == 0: del gt_posteriors[sample.sample]
+
+    # Compute 'central' allele using the allele with the median posterior sum
+    gt_counts = collections.defaultdict(int)
+    for posteriors in gt_posteriors.values():
+        for gt,prob in  posteriors.items():
+            gt_counts[gt[0]] += prob
+            gt_counts[gt[1]] += prob
+    count_items = sorted(gt_counts.items())
+    center      = compute_median(map(lambda x: x[0], count_items), map(lambda x: x[1], count_items))
+    print("CENTRAL ALLELE = %d"%(center))
+
+    # Normalize all genotypes relative to this central allele
+    str_gts = {}
+    for sample,posteriors in gt_posteriors.items():
+        new_posteriors = {}
+        for gt,prob in posteriors.items():
+            new_posteriors[(gt[0]-center, gt[1]-center)] = prob
+        str_gts[sample] = new_posteriors
+
+    # Get min/max allele
+    alleles = [item/motif_len for item in [0] + record.INFO["BPDIFFS"]]
+    min_str = min(alleles) - center
+    max_str = max(alleles) - center
+
+#    print success, str_gts, min_str, max_str, center
+    success = True
+    return success, str_gts, min_str, max_str, center, motif_len
+
 # Returns a dictionary mapping each sample name to a dictionary 
 # containing the observed repeat lengths and counts for that sample's reads
 def get_str_read_counts(vcf_reader, uselocus=None):
@@ -35,7 +88,7 @@ def get_str_read_counts(vcf_reader, uselocus=None):
     frame_counts = collections.defaultdict(int)
     for sample in record:
         if sample['GT'] is not None:
-            key = 'ALLREADS' if hasattr(sample.data, 'ALLREADS') else 'MALLREADS'
+            key = 'ALLREADS' if hasattr(sample.data, 'ALLREADS') else 'MALLREADS' # HipSTR has MALLREADS, but those are already adjusted for max lik
             if sample[key] is None:
                 continue
 

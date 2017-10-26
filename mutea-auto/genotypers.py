@@ -16,6 +16,49 @@ def MSG(msg):
 # Classes that genotype an STR given a set of reads
 
 '''
+Uses genotype likelihoods to calculate posteriors,
+assuming uniform prior over possible genotypes
+'''
+class LikelihoodGenotyper:
+    def __init__(self):
+        self.minpost = 0.001
+        self.logminpost = numpy.log(self.minpost)
+        return
+
+    def get_genotype_posteriors(self, motif_len, bpdiffs, genotype_likelihoods):
+        numalleles = len(bpdiffs)+1
+        allele_lengths = [0] + map(lambda x: x/motif_len, bpdiffs)
+        # Convert gt likelihoods to log base e
+        genotype_likelihoods = map(lambda x: x/numpy.log10(numpy.exp(1)), genotype_likelihoods)
+        total_gls = logsumexp(genotype_likelihoods)
+        LLs = {}
+        for j in range(numalleles):
+            for k in range(j, numalleles):
+                gtindex = (k*(k+1)/2) + j
+                a1 = allele_lengths[j]
+                a2 = allele_lengths[k]
+                loglik_base_e = genotype_likelihoods[gtindex]
+                LLs[(a1, a2)] = logsumexp([loglik_base_e, LLs.get((a1, a2), -1*numpy.inf)])
+        # Get rid of small ones
+        keys = LLs.keys()
+        for gt in keys:
+            if LLs[gt]-total_gls < self.logminpost:
+                del LLs[gt]
+        # normalize to sum to 1
+        denom = logsumexp(LLs.values())
+        genotype_posteriors = {}
+        keys = LLs.keys()
+        for gt in keys:
+            genotype_posteriors[gt] = numpy.exp(LLs[gt]-denom)
+        return genotype_posteriors
+
+    def train(self, sample_read_counts, min_allele, max_allele):
+        return True
+
+    def __str__(self):
+        return "ExactGenotyper"
+
+'''
 Correctly genotypes all samples and assigns the correct allele a posterior probability of 1.0
 '''
 class ExactGenotyper:
