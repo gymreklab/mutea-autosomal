@@ -126,6 +126,7 @@ class Locus:
         self.max_cycle_per_iter = 250
         self.prev_allele_range = 1
         self.best_res = None
+        self.central_allele = None
         self.stderr = []
         self.numsamples = 0
         self.stutter_model = None
@@ -185,11 +186,12 @@ class Locus:
                 # Adjust for stutter
                 if self.uselikelihoods:
                     # Get posteriors
-                    success, str_gts, min_str, max_str, center, motif_len = \
+                    success, str_gts, min_str, max_str, center, motif_len, central_allele = \
                         read_str_vcf.likelihoods_to_centralized_posteriors(reader, (self.chrom, self.start, self.end))
                     if not success: return
                     # Skip loci with large fractions of samples with out-of-frame reads - TODO? - not implemented above
                     if len(str_gts.keys()) < self.minsamples: return
+                    self.central_allele = central_allele
                 elif self.eststutter is not None:
                     # Load genotypes
                     success, chrom, start, end, motif_len, read_count_dict, \
@@ -241,6 +243,7 @@ class Locus:
                         if len(str_gts[sample].keys()) > 0 and sample in tmrcas.keys():
                             self.data.append((tmrcas[sample], str_gts[sample]))
                 if len(self.data) < self.minsamples: return
+                print len(self.data)
                 # Set metadata
                 self.minstr = min_str
                 self.maxstr = max_str
@@ -485,12 +488,16 @@ class Locus:
         outfile.write(self.GetResultsString())
         outfile.flush()
 
-    def GetResultsString(self, include_likelihood=False):
+    def GetResultsString(self, include_likelihood=False, output_central=False):
         if self.best_res is None: return ""
         likelihoodval = []
         if include_likelihood:
             likelihoodval = [self.best_res.fun]
-        return "\t".join(map(str, [self.chrom, self.start, self.end]+list(self.best_res.x) + self.stderr + [self.numsamples] + likelihoodval))+"\n"
+        centralval = []
+        if output_central:
+            centralval = [self.central_allele]
+        return "\t".join(map(str, [self.chrom, self.start, self.end]+list(self.best_res.x) + self.stderr + \
+                                 [self.numsamples] + likelihoodval + centralval))+"\n"
 
     def GetStutterString(self):
         if self.stutter_model is not None:

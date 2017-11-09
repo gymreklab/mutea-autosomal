@@ -7,9 +7,15 @@ import vcf
 
 ERRPROB = 0.01 # Probability a read is an error (rather than stutter)
 
+def MSG(msg):
+    sys.stderr.write(msg.strip() + "\n")
+
 def ERROR(msg):
     sys.stderr.write(msg.strip() + "\n")
     sys.exit(1)
+
+def FuzzyEquals(a, b, buf=10):
+    return abs(a-b)<=buf
 
 def likelihoods_to_centralized_posteriors(vcf_reader, uselocus):
     # initialize outputs
@@ -19,11 +25,12 @@ def likelihoods_to_centralized_posteriors(vcf_reader, uselocus):
     max_str = None
     center = None
     motif_len = None
-    errvals = success, str_gts, min_str, max_str, center, motif_len
+    center = None
+    errvals = success, str_gts, min_str, max_str, center, motif_len, center
 
     # Attempt to read record from VCF
     loci = list(vcf_reader.fetch(*uselocus))
-    loci = [locus for locus in loci if locus.POS == uselocus[1]]
+    loci = [locus for locus in loci if FuzzyEquals(locus.POS, uselocus[1])]
     if len(loci) != 1:
         return errvals
     record = loci[0]
@@ -34,7 +41,7 @@ def likelihoods_to_centralized_posteriors(vcf_reader, uselocus):
     motif_len = record.INFO["PERIOD"]
     for sample in record:
         if sample["GL"] is not None:
-            gt_posteriors[sample.sample] = likelihood_genotyper.get_genotype_posteriors(motif_len, record.INFO["BPDIFFS"], sample["GL"])
+            gt_posteriors[sample.sample] = likelihood_genotyper.get_genotype_posteriors(motif_len, record.INFO.get("BPDIFFS", []), sample["GL"])
             if len(gt_posteriors[sample.sample].keys()) == 0: del gt_posteriors[sample.sample]
 
     # Compute 'central' allele using the allele with the median posterior sum
@@ -44,8 +51,10 @@ def likelihoods_to_centralized_posteriors(vcf_reader, uselocus):
             gt_counts[gt[0]] += prob
             gt_counts[gt[1]] += prob
     count_items = sorted(gt_counts.items())
-    center      = compute_median(map(lambda x: x[0], count_items), map(lambda x: x[1], count_items))
-    print("CENTRAL ALLELE = %d"%(center))
+    if len(count_items) == 0:
+        MSG("No count items at locus %s"%str(uselocus))
+        return errvals
+    center = compute_median(map(lambda x: x[0], count_items), map(lambda x: x[1], count_items))
 
     # Normalize all genotypes relative to this central allele
     str_gts = {}
@@ -56,13 +65,12 @@ def likelihoods_to_centralized_posteriors(vcf_reader, uselocus):
         str_gts[sample] = new_posteriors
 
     # Get min/max allele
-    alleles = [item/motif_len for item in [0] + record.INFO["BPDIFFS"]]
+    alleles = [item/motif_len for item in [0] + record.INFO.get("BPDIFFS", [])]
     min_str = min(alleles) - center
     max_str = max(alleles) - center
 
-#    print success, str_gts, min_str, max_str, center
     success = True
-    return success, str_gts, min_str, max_str, center, motif_len
+    return success, str_gts, min_str, max_str, center, motif_len, center
 
 # Returns a dictionary mapping each sample name to a dictionary 
 # containing the observed repeat lengths and counts for that sample's reads
@@ -125,7 +133,7 @@ def get_sample_tmrcas(vcf_reader, uselocus=None):
     # Attempt to read record from VCF
     if uselocus is not None:
         loci = list(vcf_reader.fetch(*uselocus))
-        loci = [locus for locus in loci if locus.POS == uselocus[1]]
+        loci = [locus for locus in loci if FuzzyEquals(locus.POS, uselocus[1])]
         if len(loci) != 1:
             return {}
         record = loci[0]

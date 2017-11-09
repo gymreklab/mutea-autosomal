@@ -26,6 +26,8 @@ class LikelihoodGenotyper:
         return
 
     def get_genotype_posteriors(self, motif_len, bpdiffs, genotype_likelihoods):
+        if type(genotype_likelihoods) != list:
+            genotype_likelihoods = [genotype_likelihoods]
         numalleles = len(bpdiffs)+1
         allele_lengths = [0] + map(lambda x: x/motif_len, bpdiffs)
         # Convert gt likelihoods to log base e

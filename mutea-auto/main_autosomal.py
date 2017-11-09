@@ -164,7 +164,7 @@ def RunLocus(locus, args=None):
                                      lencoeff_bounds=(args.min_lencoeff, args.max_lencoeff), \
                                      debug=args.debug)
     # Print intermediate results to stderr so we can track
-    outline = locus.GetResultsString(include_likelihood=args.output_likelihood)
+    outline = locus.GetResultsString(include_likelihood=args.output_likelihood, output_central=args.output_central_allele)
     # Print stutter results
     if locus.eststutter is not None:
         stutterline = locus.GetStutterString()
@@ -221,6 +221,7 @@ def main():
 
     # Other options
     parser.add_argument("--output-likelihood", help="Add a column to the output with the model likelihood", action="store_true")
+    parser.add_argument("--output-central-allele", help="Add a column to the output with the central allele. (only implemented with --use-likelihoods)", action="store_true")
     args = parser.parse_args()
     ############################
     # Check options
